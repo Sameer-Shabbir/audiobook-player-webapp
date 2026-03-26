@@ -16,16 +16,14 @@ export function BookCard({ book, onSelect, isSelected }: BookCardProps) {
     <button
       type="button"
       onClick={() => onSelect(book)}
-      className={`group flex flex-col items-start gap-3 rounded-xl p-3 text-left transition-all duration-200 hover:bg-accent/60 ${
-        isSelected ? "bg-accent/80 ring-1 ring-border" : ""
-      }`}
+      className="group text-left"
     >
-      <div className="aspect-3/4 w-full overflow-hidden rounded-lg bg-muted">
+      <div className="relative aspect-3/4 w-full overflow-hidden rounded-xl bg-muted transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl group-hover:shadow-black/15">
         {coverUrl ? (
           <img
             src={coverUrl}
             alt={book.title}
-            className="size-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+            className="size-full object-cover transition-transform duration-500 group-hover:scale-[1.05]"
             loading="lazy"
           />
         ) : (
@@ -33,13 +31,17 @@ export function BookCard({ book, onSelect, isSelected }: BookCardProps) {
             <BookOpen className="size-10 text-muted-foreground/40" />
           </div>
         )}
-      </div>
 
-      <div className="w-full space-y-1">
-        <p className="line-clamp-2 text-sm leading-snug text-foreground">
-          {book.title}
-        </p>
-        <p className="truncate text-xs text-muted-foreground">{authorName}</p>
+        <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/80 via-black/40 to-transparent p-3 pt-12">
+          <p className="line-clamp-2 text-sm leading-snug text-white">
+            {book.title}
+          </p>
+          <p className="mt-1 truncate text-xs text-white/60">{authorName}</p>
+        </div>
+
+        {isSelected && (
+          <div className="absolute inset-0 rounded-xl ring-2 ring-primary ring-inset" />
+        )}
       </div>
     </button>
   );

@@ -3,6 +3,8 @@ import {
 	Pause,
 	SkipBack,
 	SkipForward,
+	RotateCcw,
+	RotateCw,
 	BookOpen,
 	ChevronUp,
 	ChevronDown,
@@ -101,27 +103,27 @@ export function Player({
 					</Button>
 				</div>
 
-				<div className="flex flex-1 flex-col items-center justify-center gap-6 px-6">
-					<div className="w-full max-w-[280px]">
+				<div className="flex flex-1 flex-col items-center justify-center gap-8 px-6">
+					<div className="w-full max-w-[380px]">
 						<Book3D coverUrl={coverUrl} title={book.title} />
 					</div>
 
 					<Waveform
 						isPlaying={audio.isPlaying}
-						barCount={48}
-						className="h-12 w-full max-w-sm"
+						barCount={56}
+						className="h-14 w-full max-w-md"
 					/>
 
-					<div className="w-full max-w-sm space-y-1 text-center">
-						<p className="text-lg text-foreground">{book.title}</p>
-						<p className="text-sm text-muted-foreground">{authorName}</p>
-						<p className="text-xs text-muted-foreground/60">
+					<div className="w-full max-w-md space-y-1.5 text-center">
+						<p className="text-xl text-foreground">{book.title}</p>
+						<p className="text-base text-muted-foreground">{authorName}</p>
+						<p className="text-sm text-muted-foreground/60">
 							{currentSection.title} ({currentSectionIndex + 1} of{" "}
 							{totalSections})
 						</p>
 					</div>
 
-					<div className="w-full max-w-sm space-y-2">
+					<div className="w-full max-w-md space-y-2">
 						<Slider
 							value={[audio.currentTime]}
 							min={0}
@@ -129,43 +131,59 @@ export function Player({
 							step={1}
 							onValueChange={([val]) => audio.seek(val)}
 						/>
-						<div className="flex justify-between text-xs text-muted-foreground">
+						<div className="flex justify-between text-sm text-muted-foreground">
 							<span>{formatTime(audio.currentTime)}</span>
 							<span>{formatTime(audio.duration)}</span>
 						</div>
 					</div>
 
-					<div className="flex items-center gap-4">
+					<div className="flex items-center gap-5">
 						<Button
 							variant="ghost"
 							size="icon"
 							onClick={onPrevSection}
 							disabled={currentSectionIndex === 0}
-							className="size-10"
+							className="size-12"
 						>
-							<SkipBack className="size-5" />
+							<SkipBack className="size-6" />
 						</Button>
+						<button
+							type="button"
+							onClick={() => audio.seek(Math.max(0, audio.currentTime - 10))}
+							className="relative flex size-12 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+						>
+							<RotateCcw className="size-6" />
+							<span className="absolute text-[10px]">10</span>
+						</button>
 						<Button
 							onClick={audio.togglePlayback}
 							size="icon"
-							className="size-14 rounded-full"
+							className="size-18 rounded-full"
 						>
 							{audio.isLoading ? (
-								<Loader2 className="size-6 animate-spin" />
+								<Loader2 className="size-8 animate-spin" />
 							) : audio.isPlaying ? (
-								<Pause className="size-6" />
+								<Pause className="size-8" />
 							) : (
-								<Play className="size-6 translate-x-0.5" />
+								<Play className="size-8 translate-x-0.5" />
 							)}
 						</Button>
+						<button
+							type="button"
+							onClick={() => audio.seek(Math.min(audio.duration, audio.currentTime + 10))}
+							className="relative flex size-12 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+						>
+							<RotateCw className="size-6" />
+							<span className="absolute text-[10px]">10</span>
+						</button>
 						<Button
 							variant="ghost"
 							size="icon"
 							onClick={onNextSection}
 							disabled={currentSectionIndex >= totalSections - 1}
-							className="size-10"
+							className="size-12"
 						>
-							<SkipForward className="size-5" />
+							<SkipForward className="size-6" />
 						</Button>
 					</div>
 
@@ -210,7 +228,15 @@ export function Player({
 					<ChevronUp className="size-4 shrink-0 text-muted-foreground" />
 				</button>
 
-				<div className="flex items-center gap-1">
+				<div className="flex items-center gap-0.5">
+					<button
+						type="button"
+						onClick={() => audio.seek(Math.max(0, audio.currentTime - 10))}
+						className="relative flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+					>
+						<RotateCcw className="size-3.5" />
+						<span className="absolute text-[7px]">10</span>
+					</button>
 					<Button
 						variant="ghost"
 						size="icon"
@@ -242,6 +268,14 @@ export function Player({
 					>
 						<SkipForward className="size-4" />
 					</Button>
+					<button
+						type="button"
+						onClick={() => audio.seek(Math.min(audio.duration, audio.currentTime + 10))}
+						className="relative flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+					>
+						<RotateCw className="size-3.5" />
+						<span className="absolute text-[7px]">10</span>
+					</button>
 				</div>
 			</div>
 
