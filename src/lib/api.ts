@@ -49,11 +49,14 @@ export async function fetchDefaultBooks(): Promise<Book[]> {
   }
 }
 
-export async function fetchBooksByGenre(genre: string): Promise<Book[]> {
+export async function fetchBooksByGenre(
+  genre: string,
+  limit = 40,
+): Promise<Book[]> {
   try {
     const params = new URLSearchParams({
       genre: `^${genre}`,
-      limit: "40",
+      limit: String(limit),
     });
     return await fetchBooks(params);
   } catch {

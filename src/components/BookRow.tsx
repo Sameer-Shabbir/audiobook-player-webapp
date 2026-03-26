@@ -1,0 +1,90 @@
+import { BookOpen } from "lucide-react";
+import type { Book } from "@/lib/types";
+import { getAuthorName, getCoverUrl } from "@/lib/types";
+import { Skeleton } from "@/components/ui/skeleton";
+
+interface BookRowProps {
+  title: string;
+  books: Book[];
+  onSelect: (book: Book) => void;
+  isLoading: boolean;
+}
+
+const SKELETON_KEYS = ["rs1", "rs2", "rs3", "rs4", "rs5", "rs6", "rs7", "rs8"];
+
+function RowCardSkeleton() {
+  return (
+    <>
+      {SKELETON_KEYS.map((key) => (
+        <div key={key} className="w-36 shrink-0 sm:w-40">
+          <Skeleton className="aspect-3/4 w-full rounded-xl" />
+        </div>
+      ))}
+    </>
+  );
+}
+
+function RowCard({
+  book,
+  onSelect,
+}: {
+  book: Book;
+  onSelect: (book: Book) => void;
+}) {
+  const coverUrl = getCoverUrl(book);
+  const authorName = getAuthorName(book);
+
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(book)}
+      className="group w-36 shrink-0 sm:w-40"
+    >
+      <div className="relative aspect-3/4 w-full overflow-hidden rounded-xl bg-card">
+        {coverUrl ? (
+          <img
+            src={coverUrl}
+            alt={book.title}
+            className="size-full object-cover transition-transform duration-300 group-hover:scale-[1.05]"
+            loading="lazy"
+          />
+        ) : (
+          <div className="flex size-full items-center justify-center">
+            <BookOpen className="size-8 text-muted-foreground/30" />
+          </div>
+        )}
+
+        <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/80 via-black/40 to-transparent p-3 pt-10">
+          <p className="line-clamp-2 text-xs leading-snug text-white">
+            {book.title}
+          </p>
+          <p className="mt-0.5 truncate text-[11px] text-white/50">
+            {authorName}
+          </p>
+        </div>
+      </div>
+    </button>
+  );
+}
+
+export function BookRow({ title, books, onSelect, isLoading }: BookRowProps) {
+  if (!isLoading && books.length === 0) return null;
+
+  return (
+    <section className="space-y-3">
+      <div className="flex items-center justify-between">
+        <h3 className="text-base text-foreground">{title}</h3>
+      </div>
+
+      <div className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 sm:-mx-6 sm:px-6">
+        {isLoading ? (
+          <RowCardSkeleton />
+        ) : (
+          books.map((book) => (
+            <RowCard key={book.id} book={book} onSelect={onSelect} />
+          ))
+        )}
+      </div>
+    </section>
+  );
+}

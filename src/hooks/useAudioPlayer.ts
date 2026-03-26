@@ -5,6 +5,7 @@ interface AudioPlayerState {
   currentTime: number;
   duration: number;
   isLoading: boolean;
+  playbackRate: number;
 }
 
 interface AudioPlayerActions {
@@ -13,6 +14,7 @@ interface AudioPlayerActions {
   togglePlayback: () => void;
   seek: (time: number) => void;
   setSource: (url: string) => void;
+  setPlaybackRate: (rate: number) => void;
 }
 
 export type AudioPlayer = AudioPlayerState & AudioPlayerActions;
@@ -23,6 +25,7 @@ export function useAudioPlayer(onEnded?: () => void): AudioPlayer {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [playbackRate, setPlaybackRateState] = useState(1);
 
   useEffect(() => {
     const audio = new Audio();
@@ -85,6 +88,13 @@ export function useAudioPlayer(onEnded?: () => void): AudioPlayer {
     setCurrentTime(time);
   }, []);
 
+  const setPlaybackRate = useCallback((rate: number) => {
+    if (audioRef.current) {
+      audioRef.current.playbackRate = rate;
+    }
+    setPlaybackRateState(rate);
+  }, []);
+
   const setSource = useCallback(
     (url: string) => {
       if (!audioRef.current) return;
@@ -94,11 +104,13 @@ export function useAudioPlayer(onEnded?: () => void): AudioPlayer {
       setDuration(0);
       setIsLoading(true);
 
+      audioRef.current.playbackRate = playbackRate;
+
       if (wasPlaying) {
         audioRef.current.play().then(() => setIsPlaying(true));
       }
     },
-    [],
+    [playbackRate],
   );
 
   return {
@@ -106,10 +118,12 @@ export function useAudioPlayer(onEnded?: () => void): AudioPlayer {
     currentTime,
     duration,
     isLoading,
+    playbackRate,
     play,
     pause,
     togglePlayback,
     seek,
     setSource,
+    setPlaybackRate,
   };
 }

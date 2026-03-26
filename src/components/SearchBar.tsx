@@ -34,7 +34,7 @@ export function SearchBar({ onSearch, isLoading }: SearchBarProps) {
   };
 
   return (
-    <div className="relative mx-auto w-full max-w-md">
+    <div className="relative w-full max-w-sm">
       <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center">
         {isLoading ? (
           <Loader2 className="size-4 animate-spin text-muted-foreground" />
@@ -44,10 +44,10 @@ export function SearchBar({ onSearch, isLoading }: SearchBarProps) {
       </div>
       <Input
         type="text"
-        placeholder="Search audiobooks..."
+        placeholder="Search for books, authors..."
         value={query}
         onChange={handleChange}
-        className="h-11 pl-10 text-base"
+        className="h-10 rounded-xl border-transparent bg-muted pl-10 text-sm placeholder:text-muted-foreground/60"
       />
     </div>
   );

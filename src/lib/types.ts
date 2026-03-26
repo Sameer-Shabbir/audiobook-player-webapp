@@ -44,3 +44,9 @@ export function getCoverUrl(book: Book): string | null {
   if (!raw) return null;
   return proxyArchiveUrl(raw);
 }
+
+export function getFullCoverUrl(book: Book): string | null {
+  const raw = book.coverart_jpg || book.coverart_thumbnail || null;
+  if (!raw) return null;
+  return proxyArchiveUrl(raw);
+}

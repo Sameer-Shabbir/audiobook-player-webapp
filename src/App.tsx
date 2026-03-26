@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Book, Section } from "@/lib/types";
+import { getCoverUrl } from "@/lib/types";
 import {
   searchBooks,
   fetchDefaultBooks,
@@ -9,15 +10,40 @@ import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import { SearchBar } from "@/components/SearchBar";
 import { BookGrid } from "@/components/BookGrid";
 import { Player } from "@/components/Player";
+import { HeroBanner } from "@/components/HeroBanner";
+import { BookRow } from "@/components/BookRow";
 import { CategoryFilter } from "@/components/CategoryFilter";
-import { Headphones } from "lucide-react";
+
+interface GenreRow {
+  title: string;
+  genre: string;
+  books: Book[];
+  isLoading: boolean;
+}
+
+const GENRE_ROWS: { title: string; genre: string }[] = [
+  { title: "Fiction", genre: "Fiction" },
+  { title: "Poetry", genre: "Poetry" },
+  { title: "Children", genre: "Children" },
+  { title: "Horror & Mystery", genre: "Horror" },
+];
 
 export function App() {
-  const [books, setBooks] = useState<Book[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [hasSearched, setHasSearched] = useState(false);
-  const [activeGenre, setActiveGenre] = useState<string | null>(null);
+  const [defaultBooks, setDefaultBooks] = useState<Book[]>([]);
+  const [isDefaultLoading, setIsDefaultLoading] = useState(true);
   const hasLoadedOnce = useRef(false);
+
+  const [genreRows, setGenreRows] = useState<GenreRow[]>(
+    GENRE_ROWS.map((r) => ({ ...r, books: [], isLoading: true })),
+  );
+
+  const [searchResults, setSearchResults] = useState<Book[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
+
+  const [activeGenre, setActiveGenre] = useState<string | null>(null);
+  const [genreBooks, setGenreBooks] = useState<Book[]>([]);
+  const [isGenreLoading, setIsGenreLoading] = useState(false);
 
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
@@ -45,48 +71,49 @@ export function App() {
   }, [sectionId, sectionUrl, setSource, play]);
 
   useEffect(() => {
-    setIsLoading(true);
+    setIsDefaultLoading(true);
     fetchDefaultBooks()
-      .then(setBooks)
+      .then(setDefaultBooks)
       .finally(() => {
-        setIsLoading(false);
+        setIsDefaultLoading(false);
         hasLoadedOnce.current = true;
       });
+
+    GENRE_ROWS.forEach((row, index) => {
+      fetchBooksByGenre(row.genre, 15).then((books) => {
+        setGenreRows((prev) =>
+          prev.map((r, i) =>
+            i === index ? { ...r, books, isLoading: false } : r,
+          ),
+        );
+      });
+    });
   }, []);
 
-  const loadGenre = useCallback(async (genre: string | null) => {
+  const handleGenreSelect = useCallback(async (genre: string | null) => {
     setActiveGenre(genre);
-    setHasSearched(false);
-    setIsLoading(true);
-
-    const results = genre
-      ? await fetchBooksByGenre(genre)
-      : await fetchDefaultBooks();
-
-    setBooks(results);
-    setIsLoading(false);
+    if (!genre) {
+      setGenreBooks([]);
+      return;
+    }
+    setIsGenreLoading(true);
+    const results = await fetchBooksByGenre(genre);
+    setGenreBooks(results);
+    setIsGenreLoading(false);
   }, []);
 
-  const handleSearch = useCallback(
-    async (query: string) => {
-      if (!query.trim()) {
-        setHasSearched(false);
-        setIsLoading(true);
-        const results = activeGenre
-          ? await fetchBooksByGenre(activeGenre)
-          : await fetchDefaultBooks();
-        setBooks(results);
-        setIsLoading(false);
-        return;
-      }
-      setIsLoading(true);
-      setHasSearched(true);
-      const results = await searchBooks(query);
-      setBooks(results);
-      setIsLoading(false);
-    },
-    [activeGenre],
-  );
+  const handleSearch = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      setHasSearched(false);
+      setSearchResults([]);
+      return;
+    }
+    setIsSearching(true);
+    setHasSearched(true);
+    const results = await searchBooks(query);
+    setSearchResults(results);
+    setIsSearching(false);
+  }, []);
 
   const handleSelectBook = useCallback(
     (book: Book) => {
@@ -116,13 +143,11 @@ export function App() {
     setCurrentSectionIndex(0);
   }, [audio]);
 
-  const heading = hasSearched
-    ? "Search results"
-    : activeGenre
-      ? activeGenre
-      : "Popular audiobooks";
+  const heroBook =
+    defaultBooks.find((b) => getCoverUrl(b) !== null) ?? defaultBooks[0] ?? null;
+  const popularBooks = defaultBooks.filter((b) => b.id !== heroBook?.id);
 
-  const isInitialLoad = isLoading && !hasLoadedOnce.current;
+  const isInitialLoad = isDefaultLoading && !hasLoadedOnce.current;
 
   if (isInitialLoad) {
     return (
@@ -130,9 +155,7 @@ export function App() {
         <div className="relative flex items-center justify-center">
           <span className="absolute size-16 animate-ping rounded-full bg-primary/10" />
           <span className="absolute size-16 animate-pulse rounded-full bg-primary/5" />
-          <div className="relative flex size-16 items-center justify-center rounded-2xl bg-primary/10">
-            <Headphones className="size-7 text-primary" />
-          </div>
+          <img src="/logo.png" alt="Audiobooks" className="relative size-16 object-contain" />
         </div>
         <div className="space-y-1.5 text-center">
           <p className="text-lg tracking-tight text-foreground">Audiobooks</p>
@@ -146,43 +169,82 @@ export function App() {
 
   return (
     <div className="min-h-svh bg-background">
-      <header className="border-b border-border/40">
-        <div className="mx-auto flex max-w-7xl flex-col items-center gap-6 px-4 py-8">
-          <div className="flex items-center gap-2.5 text-foreground">
-            <Headphones className="size-5" />
-            <h1 className="text-lg tracking-tight">Audiobooks</h1>
+      <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3 sm:px-6">
+          <div className="flex items-center gap-1.5">
+            <img src="/logo.png" alt="Audiobooks" className="size-6 object-contain" />
+            <span className="text-base tracking-tight text-foreground">Audiobooks</span>
           </div>
-          <SearchBar onSearch={handleSearch} isLoading={isLoading} />
+          <SearchBar onSearch={handleSearch} isLoading={isSearching} />
         </div>
       </header>
 
       <main
-        className={`mx-auto max-w-7xl px-4 py-6 ${selectedBook ? "pb-32" : ""}`}
+        className={`mx-auto max-w-7xl px-4 sm:px-6 ${selectedBook ? "pb-32" : "pb-8"}`}
       >
-        {!hasSearched && (
-          <div className="mb-6">
-            <CategoryFilter
-              activeGenre={activeGenre}
-              onSelect={loadGenre}
-              disabled={isLoading}
+        {hasSearched ? (
+          <div className="py-4">
+            <p className="mb-4 text-sm text-muted-foreground">Search results</p>
+            <BookGrid
+              books={searchResults}
+              onSelect={handleSelectBook}
+              selectedBookId={selectedBook?.id ?? null}
+              isLoading={isSearching}
             />
           </div>
-        )}
+        ) : (
+          <div className="space-y-8 py-4">
+            <HeroBanner
+              book={heroBook}
+              onSelect={handleSelectBook}
+              isLoading={isDefaultLoading}
+            />
 
-        {books.length > 0 && (
-          <p className="mb-4 text-sm text-muted-foreground">{heading}</p>
-        )}
+            <CategoryFilter
+              activeGenre={activeGenre}
+              onSelect={handleGenreSelect}
+              disabled={isGenreLoading}
+            />
 
-        <BookGrid
-          books={books}
-          onSelect={handleSelectBook}
-          selectedBookId={selectedBook?.id ?? null}
-          isLoading={isLoading}
-        />
+            {activeGenre ? (
+              <div>
+                <p className="mb-4 text-sm text-muted-foreground">
+                  {activeGenre}
+                </p>
+                <BookGrid
+                  books={genreBooks}
+                  onSelect={handleSelectBook}
+                  selectedBookId={selectedBook?.id ?? null}
+                  isLoading={isGenreLoading}
+                />
+              </div>
+            ) : (
+              <>
+                <BookRow
+                  title="Popular Audiobooks"
+                  books={popularBooks}
+                  onSelect={handleSelectBook}
+                  isLoading={isDefaultLoading}
+                />
+
+                {genreRows.map((row) => (
+                  <BookRow
+                    key={row.genre}
+                    title={row.title}
+                    books={row.books}
+                    onSelect={handleSelectBook}
+                    isLoading={row.isLoading}
+                  />
+                ))}
+              </>
+            )}
+          </div>
+        )}
       </main>
 
       {selectedBook && currentSection && (
         <Player
+          key={selectedBook.id}
           book={selectedBook}
           currentSection={currentSection}
           currentSectionIndex={currentSectionIndex}
