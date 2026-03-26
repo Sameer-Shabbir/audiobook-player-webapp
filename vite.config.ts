@@ -11,4 +11,18 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    proxy: {
+      "/api/librivox": {
+        target: "https://librivox.org",
+        changeOrigin: true,
+        rewrite: (p) => p.replace(/^\/api\/librivox/, "/api/feed"),
+      },
+      "/proxy/archive": {
+        target: "https://archive.org",
+        changeOrigin: true,
+        rewrite: (p) => p.replace(/^\/proxy\/archive/, ""),
+      },
+    },
+  },
 })
