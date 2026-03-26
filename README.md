@@ -1,21 +1,32 @@
-# React + TypeScript + Vite + shadcn/ui
+# Audiobook Player Web App
 
-This is a template for a new Vite project with React, TypeScript, and shadcn/ui.
+## Overview
+This project is a web-based audiobook player built to provide a simple and smooth listening experience. It includes basic playback controls, a clean interface, and a custom animated logo.
 
-## Adding components
+## Features
+- Play and pause audio  
+- Audio progress tracking  
+- Clean and responsive UI  
+- Custom logo and animation  
 
-To add components to your app, run the following command:
+## Tech Stack
+- React  
+- TypeScript  
+- Vite  
+- shadcn/ui  
 
-```bash
-npx shadcn@latest add button
-```
+## Running the Project
+To run the app locally:
 
-This will place the ui components in the `src/components` directory.
+- Download or clone the repository  
+- Open the project folder in your code editor  
+- Install the dependencies using `npm install`  
+- Start the development server with `npm run dev`  
+- Open the link shown in the terminal in your browser  
 
-## Using components
+## Contributors
+- Sameer Shabbir
+- Saad Bashir  
 
-To use the components in your app, import them as follows:
-
-```tsx
-import { Button } from "@/components/ui/button"
-```
+## Notes
+This project focuses on combining a clean UI with a simple audio player and custom branding.
