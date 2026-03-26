@@ -17,7 +17,6 @@ import { Slider } from "@/components/ui/slider";
 import type { Book, Section } from "@/lib/types";
 import { getAuthorName, getCoverUrl } from "@/lib/types";
 import type { AudioPlayer } from "@/hooks/useAudioPlayer";
-import { Book3D } from "./Book3D";
 import { Waveform } from "./Waveform";
 
 const SPEED_OPTIONS = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2] as const;
@@ -82,7 +81,7 @@ export function Player({
 
 	if (expanded) {
 		return (
-			<div className="fixed inset-0 z-50 flex flex-col bg-background">
+			<div className="fixed inset-0 z-50 flex flex-col bg-linear-to-b from-purple-300 via-violet-50 to-background">
 				<div className="flex items-center justify-between px-4 pt-4">
 					<Button
 						variant="ghost"
@@ -92,7 +91,11 @@ export function Player({
 					>
 						<ChevronDown className="size-5" />
 					</Button>
-					<p className="text-sm text-muted-foreground">Now Playing</p>
+					<img
+						src="/logo-transparent.png"
+						alt="Now Playing"
+						className="h-18 object-contain"
+					/>
 					<Button
 						variant="ghost"
 						size="icon"
@@ -104,8 +107,18 @@ export function Player({
 				</div>
 
 				<div className="flex flex-1 flex-col items-center justify-center gap-8 px-6">
-					<div className="w-full max-w-[380px]">
-						<Book3D coverUrl={coverUrl} title={book.title} />
+					<div className="size-64 shrink-0 overflow-hidden rounded-2xl bg-muted shadow-xl shadow-purple-200/50 lg:size-72">
+						{coverUrl ? (
+							<img
+								src={coverUrl}
+								alt={book.title}
+								className="size-full object-cover"
+							/>
+						) : (
+							<div className="flex size-full items-center justify-center">
+								<BookOpen className="size-16 text-muted-foreground/30" />
+							</div>
+						)}
 					</div>
 
 					<Waveform
@@ -150,7 +163,7 @@ export function Player({
 						<button
 							type="button"
 							onClick={() => audio.seek(Math.max(0, audio.currentTime - 10))}
-							className="relative flex size-12 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+							className="relative flex size-12 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-white/50 hover:text-foreground"
 						>
 							<RotateCcw className="size-6" />
 							<span className="absolute text-[10px]">10</span>
@@ -170,8 +183,10 @@ export function Player({
 						</Button>
 						<button
 							type="button"
-							onClick={() => audio.seek(Math.min(audio.duration, audio.currentTime + 10))}
-							className="relative flex size-12 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+							onClick={() =>
+								audio.seek(Math.min(audio.duration, audio.currentTime + 10))
+							}
+							className="relative flex size-12 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-white/50 hover:text-foreground"
 						>
 							<RotateCw className="size-6" />
 							<span className="absolute text-[10px]">10</span>
@@ -270,7 +285,9 @@ export function Player({
 					</Button>
 					<button
 						type="button"
-						onClick={() => audio.seek(Math.min(audio.duration, audio.currentTime + 10))}
+						onClick={() =>
+							audio.seek(Math.min(audio.duration, audio.currentTime + 10))
+						}
 						className="relative flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
 					>
 						<RotateCw className="size-3.5" />

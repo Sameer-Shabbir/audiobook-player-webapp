@@ -176,9 +176,9 @@ export function App() {
 				<div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3 sm:px-6">
 					<div className="flex items-center gap-1.5">
 						<img
-							src="/logo.png"
+							src="/Screenshot_2026-03-26_at_19.50.23-removebg-preview.png"
 							alt="Audiobooks"
-							className="size-6 object-contain"
+							className="size-20 object-contain"
 						/>
 						<span className="text-base tracking-tight text-foreground">
 							Audiobooks
