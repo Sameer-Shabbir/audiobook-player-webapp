@@ -1,8 +1,10 @@
 import { Play, BookOpen, Clock } from "lucide-react";
+import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import type { Book } from "@/lib/types";
 import { getAuthorName, getFullCoverUrl } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
+import { fadeSlideUp } from "@/lib/animations";
 
 interface HeroBannerProps {
   book: Book | null;
@@ -39,7 +41,7 @@ export function HeroBanner({ book, onSelect, isLoading }: HeroBannerProps) {
   const description = book.description ? stripHtml(book.description) : "";
 
   return (
-    <div className="group relative w-full overflow-hidden rounded-2xl bg-black/90">
+    <motion.div {...fadeSlideUp} className="group relative w-full overflow-hidden rounded-2xl bg-black/90">
       {coverUrl && (
         <img
           src={coverUrl}
@@ -98,6 +100,6 @@ export function HeroBanner({ book, onSelect, isLoading }: HeroBannerProps) {
           </div>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }

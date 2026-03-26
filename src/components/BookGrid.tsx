@@ -1,6 +1,8 @@
+import { motion } from "motion/react";
 import type { Book } from "@/lib/types";
 import { BookCard } from "./BookCard";
 import { Skeleton } from "@/components/ui/skeleton";
+import { staggerContainer, staggerItem } from "@/lib/animations";
 
 interface BookGridProps {
   books: Book[];
@@ -45,19 +47,25 @@ export function BookGrid({
   }
 
   return (
-    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+    <motion.div
+      variants={staggerContainer}
+      initial="initial"
+      animate="animate"
+      className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
+    >
       {isLoading ? (
         <GridSkeleton />
       ) : (
         books.map((book) => (
-          <BookCard
-            key={book.id}
-            book={book}
-            onSelect={onSelect}
-            isSelected={book.id === selectedBookId}
-          />
+          <motion.div key={book.id} variants={staggerItem}>
+            <BookCard
+              book={book}
+              onSelect={onSelect}
+              isSelected={book.id === selectedBookId}
+            />
+          </motion.div>
         ))
       )}
-    </div>
+    </motion.div>
   );
 }

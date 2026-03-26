@@ -1,6 +1,8 @@
 import { BookOpen } from "lucide-react";
+import { motion } from "motion/react";
 import type { Book } from "@/lib/types";
 import { getAuthorName, getCoverUrl } from "@/lib/types";
+import { tapScale } from "@/lib/animations";
 
 interface BookCardProps {
   book: Book;
@@ -13,9 +15,10 @@ export function BookCard({ book, onSelect, isSelected }: BookCardProps) {
   const authorName = getAuthorName(book);
 
   return (
-    <button
+    <motion.button
       type="button"
       onClick={() => onSelect(book)}
+      {...tapScale}
       className="group text-left"
     >
       <div className="relative aspect-3/4 w-full overflow-hidden rounded-xl bg-muted transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl group-hover:shadow-black/15">
@@ -43,6 +46,6 @@ export function BookCard({ book, onSelect, isSelected }: BookCardProps) {
           <div className="absolute inset-0 rounded-xl ring-2 ring-primary ring-inset" />
         )}
       </div>
-    </button>
+    </motion.button>
   );
 }

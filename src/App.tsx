@@ -168,7 +168,7 @@ export function App() {
 						autoPlay
 						muted
 						playsInline
-						className="w-full max-w-2xl"
+						className="w-full max-w-xl"
 					/>
 				</div>
 			)}
@@ -176,7 +176,7 @@ export function App() {
 				<div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3 sm:px-6">
 					<div className="flex items-center gap-1.5">
 						<img
-							src="/Screenshot_2026-03-26_at_19.50.23-removebg-preview.png"
+							src="/logo-transparent.png"
 							alt="Audiobooks"
 							className="size-20 object-contain"
 						/>

@@ -12,12 +12,14 @@ import {
 	Loader2,
 } from "lucide-react";
 import { useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import type { Book, Section } from "@/lib/types";
 import { getAuthorName, getCoverUrl } from "@/lib/types";
 import type { AudioPlayer } from "@/hooks/useAudioPlayer";
 import { Waveform } from "./Waveform";
+import { fadeIn, scaleIn, slideUp, slideUpMini, fadeSlideUp } from "@/lib/animations";
 
 const SPEED_OPTIONS = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2] as const;
 
@@ -81,7 +83,10 @@ export function Player({
 
 	if (expanded) {
 		return (
-			<div className="fixed inset-0 z-50 flex flex-col bg-linear-to-b from-purple-300 via-violet-50 to-background">
+			<motion.div
+				{...slideUp}
+				className="fixed inset-0 z-50 flex flex-col bg-linear-to-b from-purple-300 via-violet-50 to-background"
+			>
 				<div className="flex items-center justify-between px-4 pt-4">
 					<Button
 						variant="ghost"
@@ -107,7 +112,10 @@ export function Player({
 				</div>
 
 				<div className="flex flex-1 flex-col items-center justify-center gap-8 px-6">
-					<div className="size-64 shrink-0 overflow-hidden rounded-2xl bg-muted shadow-xl shadow-purple-200/50 lg:size-72">
+					<motion.div
+						{...scaleIn}
+						className="size-64 shrink-0 overflow-hidden rounded-2xl bg-muted shadow-xl shadow-purple-200/50 lg:size-72"
+					>
 						{coverUrl ? (
 							<img
 								src={coverUrl}
@@ -119,7 +127,7 @@ export function Player({
 								<BookOpen className="size-16 text-muted-foreground/30" />
 							</div>
 						)}
-					</div>
+					</motion.div>
 
 					<Waveform
 						isPlaying={audio.isPlaying}
@@ -127,14 +135,14 @@ export function Player({
 						className="h-14 w-full max-w-md"
 					/>
 
-					<div className="w-full max-w-md space-y-1.5 text-center">
+					<motion.div {...fadeSlideUp} className="w-full max-w-md space-y-1.5 text-center">
 						<p className="text-xl text-foreground">{book.title}</p>
 						<p className="text-base text-muted-foreground">{authorName}</p>
 						<p className="text-sm text-muted-foreground/60">
 							{currentSection.title} ({currentSectionIndex + 1} of{" "}
 							{totalSections})
 						</p>
-					</div>
+					</motion.div>
 
 					<div className="w-full max-w-md space-y-2">
 						<Slider
@@ -207,12 +215,15 @@ export function Player({
 						onChange={audio.setPlaybackRate}
 					/>
 				</div>
-			</div>
+			</motion.div>
 		);
 	}
 
 	return (
-		<div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/80 backdrop-blur-xl">
+		<motion.div
+			{...slideUpMini}
+			className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/80 backdrop-blur-xl"
+		>
 			<div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3">
 				<button
 					type="button"
@@ -305,6 +316,6 @@ export function Player({
 					onValueChange={([val]) => audio.seek(val)}
 				/>
 			</div>
-		</div>
+		</motion.div>
 	);
 }

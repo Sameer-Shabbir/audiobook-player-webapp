@@ -1,7 +1,9 @@
 import { BookOpen } from "lucide-react";
+import { motion } from "motion/react";
 import type { Book } from "@/lib/types";
 import { getAuthorName, getCoverUrl } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
+import { staggerContainer, staggerItem, tapScale } from "@/lib/animations";
 
 interface BookRowProps {
   title: string;
@@ -35,8 +37,10 @@ function RowCard({
   const authorName = getAuthorName(book);
 
   return (
-    <button
+    <motion.button
       type="button"
+      variants={staggerItem}
+      {...tapScale}
       onClick={() => onSelect(book)}
       className="group w-40 shrink-0 sm:w-44"
     >
@@ -63,7 +67,7 @@ function RowCard({
           </p>
         </div>
       </div>
-    </button>
+    </motion.button>
   );
 }
 
@@ -76,7 +80,12 @@ export function BookRow({ title, books, onSelect, isLoading }: BookRowProps) {
         <h3 className="text-base text-foreground">{title}</h3>
       </div>
 
-      <div className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 sm:-mx-6 sm:px-6">
+      <motion.div
+        variants={staggerContainer}
+        initial="initial"
+        animate="animate"
+        className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 sm:-mx-6 sm:px-6"
+      >
         {isLoading ? (
           <RowCardSkeleton />
         ) : (
@@ -84,7 +93,7 @@ export function BookRow({ title, books, onSelect, isLoading }: BookRowProps) {
             <RowCard key={book.id} book={book} onSelect={onSelect} />
           ))
         )}
-      </div>
+      </motion.div>
     </section>
   );
 }
